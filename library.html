@@ -65,6 +65,28 @@
     color: var(--ink);
     text-shadow: 0 0 12px rgba(201,163,78,0.35);
   }
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  #back-to-top.visible {
+    opacity: 1;
+  }
   @media (prefers-reduced-motion: reduce) {
     header h1 a, header h1 a::after { transition: none; }
   }
@@ -400,7 +422,7 @@
     font-size: 1.1rem;
   }
 
-  @media (max-width: 650px) {
+  @media (max-width: 650px), (max-height: 500px) {
     header {
       padding: 24px 16px 16px;
     }
@@ -461,6 +483,7 @@
     .meta .director,
     .meta .year { font-size: 0.7rem; }
     .edit-toggle { width: 100%; }
+    #back-to-top { display: flex; align-items: center; justify-content: center; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
@@ -507,6 +530,7 @@
 </div>
 
 <div class="grid" id="grid"></div>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
 <div class="empty" id="empty" style="display:none;">Nada por acá con esos filtros.</div>
 
 <script>
@@ -792,6 +816,14 @@ yearInput.addEventListener('input', () => {
 
 
 render();
+
+const backToTop = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 400);
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 </script>
 </body>
 </html>
