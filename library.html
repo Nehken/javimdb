@@ -768,6 +768,9 @@ function updateClearButton() {
 }
 
 searchInput.addEventListener('input', () => { updateClearButton(); render(); });
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') searchInput.blur();
+});
 searchClear.addEventListener('click', () => {
   searchInput.value = '';
   updateClearButton();
