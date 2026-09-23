@@ -69,7 +69,7 @@ Tiene buscador, filtro por película/serie, y varios criterios de orden
 ## Notas
 
 - Las series se guardan con **una sola nota global**, sin desglose por
-  temporada — como lo pediste.
+  temporada.
 - Si agregás un título que ya existe (mismo `tmdb_id` + tipo), se
   actualiza la nota y la fecha en vez de duplicarse.
 - Si TMDB no tiene el `imdb_id` de algo (pasa con títulos muy nuevos o
