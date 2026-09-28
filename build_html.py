@@ -659,6 +659,12 @@ __BASE_CSS__
       <label for="year-max">Hasta</label>
       <input type="number" id="year-max" placeholder="2099" min="1900" max="2099">
     </div>
+    <div class="advanced-field">
+      <label for="filter-lang">Idioma</label>
+      <select id="filter-lang">
+        <option value="">Todos</option>
+      </select>
+    </div>
   </div>
   <button id="clear-advanced" class="clear-advanced-btn">Limpiar avanzados</button>
 </div>
@@ -698,6 +704,19 @@ const params = new URLSearchParams(window.location.search);
 let countryFilter = params.get('country');
 let decadeFilter = params.get('decade') ? parseInt(params.get('decade')) : null;
 let yearFilter = null;
+
+const langSelect = document.getElementById('filter-lang');
+const langDisplay = new Intl.DisplayNames(['es'], { type: 'language' });
+// TMDB usa 'cn' como código no-estándar para chino; normalizar antes de deduplicar
+const LANG_CODE_FIX = { 'cn': 'zh' };
+[...new Set(DATA.map(d => d.original_language).filter(Boolean).map(c => LANG_CODE_FIX[c] || c))]
+  .sort((a, b) => (langDisplay.of(a) || a).localeCompare(langDisplay.of(b) || b, 'es'))
+  .forEach(code => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = langDisplay.of(code) || code;
+    langSelect.appendChild(opt);
+  });
 let yearMin = null;
 let yearMax = null;
 let minRating = 1;
@@ -836,6 +855,7 @@ function updateActiveFilterBadge() {
   if (yearMin !== null) count++;
   if (yearMax !== null) count++;
   if (minRating !== 1 || maxRating !== 10) count++;
+  if (langSelect.value) count++;
   activeFilterCountEl.textContent = count;
   activeFilterCountEl.style.display = count > 0 ? 'inline-block' : 'none';
 }
@@ -886,6 +906,7 @@ function render() {
     if (yearMin !== null && (!item.year || item.year < yearMin)) return false;
     if (yearMax !== null && (!item.year || item.year > yearMax)) return false;
     if (type !== 'all' && item.media_type !== type) return false;
+    if (langSelect.value && (LANG_CODE_FIX[item.original_language] || item.original_language) !== langSelect.value) return false;
     if (item.rating < minRating || item.rating > maxRating) return false;
     if (!q) return true;
     const haystack = `${item.title_en} ${item.title_original_display || item.title_original} ${item.director || ''}`.toLowerCase();
@@ -1000,6 +1021,7 @@ searchClear.addEventListener('click', () => {
 });
 updateClearButton();
 typeFilter.addEventListener('change', render);
+langSelect.addEventListener('change', () => { updateActiveFilterBadge(); render(); });
 sortBy.addEventListener('change', render);
 yearInput.addEventListener('input', () => {
   const v = parseInt(yearInput.value);
@@ -1041,6 +1063,7 @@ clearAdvancedBtn.addEventListener('click', () => {
   yearMaxInput.value = '';
   yearMin = null;
   yearMax = null;
+  langSelect.value = '';
   if (ratingSliderEl.noUiSlider) {
     ratingSliderEl.noUiSlider.set([1, 10]);
   }
