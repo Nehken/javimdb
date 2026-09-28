@@ -1,0 +1,26 @@
+# Data — personal, never commit
+library.db
+library.html
+stats.html
+ratings.csv
+matches_de_respaldo_revisar.csv
+episodios_sueltos_sin_cargar.csv
+
+# Secrets
+config.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# VSCode / OS
+.vscode/
+MyIMDB.code-workspace
+JaviMDb.code-workspace
+*.jpeg
+*.jpg
+.DS_Store
+Thumbs.db
