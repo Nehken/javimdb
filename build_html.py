@@ -845,7 +845,7 @@ function formatRating(rating) {
 }
 
 function tierClass(rating) {
-  if (rating >= 9) return 'tier-elite';
+  if (rating >= 8.5) return 'tier-elite';
   if (rating <= 4) return 'tier-low';
   return '';
 }
@@ -960,7 +960,7 @@ function render() {
         ${posterHtml}
         <span class="type-flag ${item.media_type}">${item.media_type === 'movie' ? 'peli' : 'serie'}</span>
         ${stampHtml}
-        ${item.rating >= 9 ? '<span class="tier-star">★</span>' : ''}
+        ${item.rating >= 8.5 ? '<span class="tier-star">★</span>' : ''}
       </div>
       <div class="meta">
         <p class="title-en">${item.title_en}</p>
