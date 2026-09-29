@@ -1,7 +1,5 @@
 # Data — personal, never commit
 library.db
-library.html
-stats.html
 ratings.csv
 matches_de_respaldo_revisar.csv
 episodios_sueltos_sin_cargar.csv
