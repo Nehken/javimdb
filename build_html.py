@@ -915,7 +915,7 @@ function render() {
 
   const movieCount = items.filter(d => d.media_type === 'movie').length;
   const tvCount = items.filter(d => d.media_type === 'tv').length;
-  countTag.textContent = `${movieCount} pelis · ${tvCount} series`;
+  countTag.textContent = `${movieCount} peliculas · ${tvCount} series`;
 
   switch (sortBy.value) {
     case 'rating_desc': items.sort((a,b) => b.rating - a.rating); break;
@@ -958,7 +958,7 @@ function render() {
     el.innerHTML = `
       <div class="poster-wrap">
         ${posterHtml}
-        <span class="type-flag ${item.media_type}">${item.media_type === 'movie' ? 'peli' : 'serie'}</span>
+        <span class="type-flag ${item.media_type}">${item.media_type === 'movie' ? 'pelicula' : 'serie'}</span>
         ${stampHtml}
         ${item.rating >= 8.5 ? '<span class="tier-star">★</span>' : ''}
       </div>

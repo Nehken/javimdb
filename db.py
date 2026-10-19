@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS titles (
     title_original  TEXT NOT NULL,          -- titulo original (frances, japones, castellano, etc)
     original_language TEXT,
     year            INTEGER,
-    director        TEXT,                   -- director (peli) o creador/es (serie)
+    director        TEXT,                   -- director (pelicula) o creador/es (serie)
     poster_path     TEXT,                   -- path relativo de TMDB, se arma la URL completa al exportar
     imdb_id         TEXT,                   -- ej: tt0078748 -> arma el link a imdb.com/title/tt0078748
     rating          REAL NOT NULL,          -- tu nota, 1.0 a 10.0 en pasos de 0.5

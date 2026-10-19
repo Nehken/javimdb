@@ -38,7 +38,7 @@ def search(query):
 def pick_result(results):
     print("\nResultados:")
     for i, r in enumerate(results[:20]):
-        media_type = "Peli" if r["media_type"] == "movie" else "Serie"
+        media_type = "Pelicula" if r["media_type"] == "movie" else "Serie"
         title = r.get("title") or r.get("name")
         original = r.get("original_title") or r.get("original_name")
         date = r.get("release_date") or r.get("first_air_date") or ""
