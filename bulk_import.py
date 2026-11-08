@@ -118,6 +118,18 @@ def parse_countries(detail):
     return ",".join(codes) if codes else None
 
 
+def parse_genres(detail):
+    """Generos de TMDB como "Drama,Documentary" (mismo formato que production_countries)."""
+    names = [g["name"] for g in detail.get("genres") or [] if g.get("name")]
+    return ",".join(names) if names else None
+
+
+def parse_csv_genres(row):
+    """El CSV de IMDB trae 'Genres' como "Documentary, Drama"; lo normalizo al mismo formato."""
+    names = [g.strip() for g in (row.get("Genres") or "").split(",") if g.strip()]
+    return ",".join(names) if names else None
+
+
 def parse_director_or_creator(detail, media_type, csv_directors):
     if media_type == "tv":
         creators = [person["name"] for person in detail.get("created_by", []) if person.get("name")]
@@ -266,6 +278,7 @@ def main():
                 "date_watched": row.get("Date Rated") or None,
                 "production_countries": None,
                 "imdb_public_rating": imdb_public_rating,
+                "genres": parse_csv_genres(row),
             }
         else:
             try:
@@ -294,6 +307,7 @@ def main():
                 "date_watched": row.get("Date Rated") or None,
                 "production_countries": parse_countries(detail),
                 "imdb_public_rating": imdb_public_rating,
+                "genres": parse_genres(detail),
             }
 
             if used_fallback:

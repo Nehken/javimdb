@@ -125,6 +125,8 @@ def main():
     imdb_id = detail.get("external_ids", {}).get("imdb_id")
     countries = detail.get("production_countries") or []
     country_codes = ",".join(c["iso_3166_1"] for c in countries if c.get("iso_3166_1")) or None
+    # Generos de TMDB como "Drama,Documentary" (mismo formato que los paises)
+    genres = ",".join(g["name"] for g in detail.get("genres", []) if g.get("name")) or None
 
     print(f"\n{title_en} ({year}) -- dirigida/creada por: {director or 'desconocido'}")
     if not imdb_id:
@@ -146,6 +148,7 @@ def main():
         "rating": rating,
         "date_watched": date_watched,
         "production_countries": country_codes,
+        "genres": genres,
         "imdb_public_rating": None,
     }
     db.insert_title(entry)

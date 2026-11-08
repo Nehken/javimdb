@@ -236,6 +236,7 @@ __BASE_CSS__
   }
   .advanced-year-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
   .clear-advanced-btn {
@@ -285,7 +286,10 @@ __BASE_CSS__
   }
   .export-menu-item:hover { background: var(--bg); }
   #back-to-top {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -305,6 +309,7 @@ __BASE_CSS__
   }
   #back-to-top.visible {
     opacity: 1;
+    pointer-events: auto;
   }
   .filter-chip {
     display: none;
@@ -665,6 +670,14 @@ __BASE_CSS__
         <option value="">Todos</option>
       </select>
     </div>
+    <div class="advanced-field">
+      <label for="filter-genre">Género</label>
+      <select id="filter-genre">
+        <option value="">Todos</option>
+        <option value="documentary">Documentales</option>
+        <option value="anime">Anime</option>
+      </select>
+    </div>
   </div>
   <button id="clear-advanced" class="clear-advanced-btn">Limpiar avanzados</button>
 </div>
@@ -704,6 +717,21 @@ const params = new URLSearchParams(window.location.search);
 let countryFilter = params.get('country');
 let decadeFilter = params.get('decade') ? parseInt(params.get('decade')) : null;
 let yearFilter = null;
+
+const genreSelect = document.getElementById('filter-genre');
+// genres viene como "Drama,Documentary" (igual que production_countries); override manual = is_documentary_override (1/0/null)
+function isDocumentary(item) {
+  if (item.is_documentary_override === 1 || item.is_documentary_override === 0) {
+    return item.is_documentary_override === 1;
+  }
+  return (item.genres || '').split(',').map(g => g.trim()).includes('Documentary');
+}
+
+// anime = genero Animation + idioma original japones (no es un genero en TMDB, se deriva)
+function isAnime(item) {
+  const genres = (item.genres || '').split(',').map(g => g.trim());
+  return genres.includes('Animation') && item.original_language === 'ja';
+}
 
 const langSelect = document.getElementById('filter-lang');
 const langDisplay = new Intl.DisplayNames(['es'], { type: 'language' });
@@ -856,6 +884,7 @@ function updateActiveFilterBadge() {
   if (yearMax !== null) count++;
   if (minRating !== 1 || maxRating !== 10) count++;
   if (langSelect.value) count++;
+  if (genreSelect.value) count++;
   activeFilterCountEl.textContent = count;
   activeFilterCountEl.style.display = count > 0 ? 'inline-block' : 'none';
 }
@@ -906,6 +935,8 @@ function render() {
     if (yearMin !== null && (!item.year || item.year < yearMin)) return false;
     if (yearMax !== null && (!item.year || item.year > yearMax)) return false;
     if (type !== 'all' && item.media_type !== type) return false;
+    if (genreSelect.value === 'documentary' && !isDocumentary(item)) return false;
+    if (genreSelect.value === 'anime' && !isAnime(item)) return false;
     if (langSelect.value && (LANG_CODE_FIX[item.original_language] || item.original_language) !== langSelect.value) return false;
     if (item.rating < minRating || item.rating > maxRating) return false;
     if (!q) return true;
@@ -1022,6 +1053,7 @@ searchClear.addEventListener('click', () => {
 updateClearButton();
 typeFilter.addEventListener('change', render);
 langSelect.addEventListener('change', () => { updateActiveFilterBadge(); render(); });
+genreSelect.addEventListener('change', () => { updateActiveFilterBadge(); render(); });
 sortBy.addEventListener('change', render);
 yearInput.addEventListener('input', () => {
   const v = parseInt(yearInput.value);
@@ -1064,6 +1096,7 @@ clearAdvancedBtn.addEventListener('click', () => {
   yearMin = null;
   yearMax = null;
   langSelect.value = '';
+  genreSelect.value = '';
   if (ratingSliderEl.noUiSlider) {
     ratingSliderEl.noUiSlider.set([1, 10]);
   }

@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS titles (
     date_watched    TEXT,                   -- YYYY-MM-DD, opcional
     production_countries TEXT,              -- codigos ISO separados por coma, ej "AR,ES" (coproducciones)
     imdb_public_rating REAL,                -- nota publica de IMDB (del CSV), para comparar con la tuya
+    genres          TEXT,                   -- generos separados por coma, ej "Drama,Documentary" (filtros de documentales/anime)
     added_at        TEXT DEFAULT (datetime('now')),
     UNIQUE(tmdb_id, media_type)
 );
@@ -49,6 +50,8 @@ def _migrate(conn):
         conn.execute("ALTER TABLE titles ADD COLUMN production_countries TEXT")
     if "imdb_public_rating" not in existing:
         conn.execute("ALTER TABLE titles ADD COLUMN imdb_public_rating REAL")
+    if "genres" not in existing:
+        conn.execute("ALTER TABLE titles ADD COLUMN genres TEXT")
 
 
 def init_db():
@@ -60,24 +63,25 @@ def init_db():
 def insert_title(entry: dict):
     """entry necesita: tmdb_id, media_type, title_en, title_original,
     original_language, year, director, poster_path, imdb_id, rating, date_watched.
-    production_countries e imdb_public_rating son opcionales."""
-    entry = {"production_countries": None, "imdb_public_rating": None, **entry}
+    production_countries, imdb_public_rating y genres son opcionales."""
+    entry = {"production_countries": None, "imdb_public_rating": None, "genres": None, **entry}
     with get_conn() as conn:
         conn.execute(
             """
             INSERT INTO titles
                 (tmdb_id, media_type, title_en, title_original, original_language,
                  year, director, poster_path, imdb_id, rating, date_watched,
-                 production_countries, imdb_public_rating)
+                 production_countries, imdb_public_rating, genres)
             VALUES
                 (:tmdb_id, :media_type, :title_en, :title_original, :original_language,
                  :year, :director, :poster_path, :imdb_id, :rating, :date_watched,
-                 :production_countries, :imdb_public_rating)
+                 :production_countries, :imdb_public_rating, :genres)
             ON CONFLICT(tmdb_id, media_type) DO UPDATE SET
                 rating=excluded.rating,
                 date_watched=excluded.date_watched,
                 production_countries=COALESCE(excluded.production_countries, titles.production_countries),
-                imdb_public_rating=COALESCE(excluded.imdb_public_rating, titles.imdb_public_rating)
+                imdb_public_rating=COALESCE(excluded.imdb_public_rating, titles.imdb_public_rating),
+                genres=COALESCE(excluded.genres, titles.genres)
             """,
             entry,
         )
